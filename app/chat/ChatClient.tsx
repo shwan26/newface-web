@@ -6,6 +6,7 @@ import { Chip, GhostButton, PrimaryButton } from "@/components/UI";
 import { generateAssistantReply } from "@/lib/fakeAI";
 import type { ChatMessage, ChatSession } from "@/lib/types";
 import { getSession, loadSessions, upsertSession } from "@/lib/storage";
+import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -26,6 +27,7 @@ const quickChips = [
 ];
 
 export default function ChatClient() {
+  const { user } = useAuth();
   const params = useSearchParams();
   const router = useRouter();
   const sessionId = params.get("id");
@@ -46,7 +48,10 @@ export default function ChatClient() {
   // Close attach menu on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (attachMenuRef.current && !attachMenuRef.current.contains(e.target as Node)) {
+      if (
+        attachMenuRef.current &&
+        !attachMenuRef.current.contains(e.target as Node)
+      ) {
         setAttachMenuOpen(false);
       }
     }
@@ -125,7 +130,9 @@ export default function ChatClient() {
       const shouldTitle = prev.title === "New chat";
       const next = {
         ...prev,
-        title: shouldTitle ? titleFromFirstUserMessage(trimmed || "Photo") : prev.title,
+        title: shouldTitle
+          ? titleFromFirstUserMessage(trimmed || "Photo")
+          : prev.title,
       };
       upsertSession(next);
       return next;
@@ -133,8 +140,13 @@ export default function ChatClient() {
 
     setThinking(true);
     await new Promise((r) => setTimeout(r, 850));
-    const replyText = generateAssistantReply(trimmed);
-    pushMessage({ id: uid(), role: "newface", text: replyText, ts: Date.now() });
+    const replyText = generateAssistantReply(trimmed, user?.username);
+    pushMessage({
+      id: uid(),
+      role: "newface",
+      text: replyText,
+      ts: Date.now(),
+    });
     setThinking(false);
   }
 
@@ -143,12 +155,15 @@ export default function ChatClient() {
     return (
       <>
         <Screen title="Chat" subtitle="Start a new chat or open a recent one.">
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 pb-24">
             <PrimaryButton onClick={createNewChat}>New Chat</PrimaryButton>
 
             <div
               className="rounded-2xl border p-4"
-              style={{ background: "var(--card)", borderColor: "var(--border)" }}
+              style={{
+                background: "var(--card)",
+                borderColor: "var(--border)",
+              }}
             >
               <div className="text-sm font-semibold">Recent chats</div>
               <div className="mt-2 flex flex-col gap-2">
@@ -168,7 +183,10 @@ export default function ChatClient() {
                       }}
                     >
                       <div className="font-semibold">{s.title}</div>
-                      <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                      <div
+                        className="mt-1 text-xs"
+                        style={{ color: "var(--muted)" }}
+                      >
                         {s.messages.length} messages
                       </div>
                     </Link>
@@ -215,8 +233,11 @@ export default function ChatClient() {
         }}
       />
 
-      <Screen title="Quick Chat" subtitle="Prototype guidance only. Not medical advice.">
-        <div className="flex flex-col gap-3">
+      <Screen
+        title="Quick Chat"
+        subtitle="Prototype guidance only. Not medical advice."
+      >
+        <div className="flex flex-col gap-3 pb-24">
           {/* Quick chips */}
           <div className="flex flex-wrap gap-2">
             {quickChips.map((c) => (
@@ -243,7 +264,10 @@ export default function ChatClient() {
                           ? "linear-gradient(90deg, var(--gold), var(--rose))"
                           : "rgba(255,255,255,0.80)",
                       color: m.role === "user" ? "white" : "var(--fg)",
-                      border: m.role === "newface" ? "1px solid var(--border)" : "none",
+                      border:
+                        m.role === "newface"
+                          ? "1px solid var(--border)"
+                          : "none",
                     }}
                   >
                     {/* Attached image preview inside bubble */}
@@ -272,7 +296,10 @@ export default function ChatClient() {
                   <span className="inline-flex items-center gap-2">
                     <span
                       className="h-2 w-2 animate-pulse rounded-full"
-                      style={{ background: "linear-gradient(90deg, var(--gold), var(--rose))" }}
+                      style={{
+                        background:
+                          "linear-gradient(90deg, var(--gold), var(--rose))",
+                      }}
                     />
                     Analyzing…
                   </span>
@@ -295,7 +322,11 @@ export default function ChatClient() {
               <button
                 onClick={() => setAttachedImage(null)}
                 className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-white"
-                style={{ background: "linear-gradient(135deg, var(--gold), var(--rose))", fontSize: 11 }}
+                style={{
+                  background:
+                    "linear-gradient(135deg, var(--gold), var(--rose))",
+                  fontSize: 11,
+                }}
               >
                 ✕
               </button>
@@ -304,7 +335,6 @@ export default function ChatClient() {
 
           {/* Input row */}
           <div className="relative flex items-center gap-2">
-
             {/* + button with popover */}
             <div ref={attachMenuRef} className="relative">
               <button
@@ -322,7 +352,9 @@ export default function ChatClient() {
                   style={{
                     color: attachMenuOpen ? "white" : "var(--gold)",
                     display: "inline-block",
-                    transform: attachMenuOpen ? "rotate(45deg)" : "rotate(0deg)",
+                    transform: attachMenuOpen
+                      ? "rotate(45deg)"
+                      : "rotate(0deg)",
                   }}
                 >
                   +
@@ -338,7 +370,8 @@ export default function ChatClient() {
                     backdropFilter: "blur(16px)",
                     WebkitBackdropFilter: "blur(16px)",
                     border: "1px solid rgba(232,166,187,0.30)",
-                    boxShadow: "0 8px 32px rgba(200,162,74,0.14), 0 2px 8px rgba(232,166,187,0.12)",
+                    boxShadow:
+                      "0 8px 32px rgba(200,162,74,0.14), 0 2px 8px rgba(232,166,187,0.12)",
                     minWidth: 168,
                   }}
                 >
@@ -350,15 +383,49 @@ export default function ChatClient() {
                   >
                     <span
                       className="flex h-8 w-8 items-center justify-center rounded-xl"
-                      style={{ background: "linear-gradient(135deg, rgba(200,162,74,0.15), rgba(232,166,187,0.15))" }}
+                      style={{
+                        background:
+                          "linear-gradient(135deg, rgba(200,162,74,0.15), rgba(232,166,187,0.15))",
+                      }}
                     >
                       {/* Camera icon */}
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                        <rect x="2" y="7" width="20" height="14" rx="3" stroke="url(#cam-g)" strokeWidth="1.8" />
-                        <circle cx="12" cy="14" r="3.5" stroke="url(#cam-g)" strokeWidth="1.8" />
-                        <path d="M8 7V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1" stroke="url(#cam-g)" strokeWidth="1.8" strokeLinecap="round" />
+                      <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <rect
+                          x="2"
+                          y="7"
+                          width="20"
+                          height="14"
+                          rx="3"
+                          stroke="url(#cam-g)"
+                          strokeWidth="1.8"
+                        />
+                        <circle
+                          cx="12"
+                          cy="14"
+                          r="3.5"
+                          stroke="url(#cam-g)"
+                          strokeWidth="1.8"
+                        />
+                        <path
+                          d="M8 7V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1"
+                          stroke="url(#cam-g)"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
                         <defs>
-                          <linearGradient id="cam-g" x1="2" y1="4" x2="22" y2="21" gradientUnits="userSpaceOnUse">
+                          <linearGradient
+                            id="cam-g"
+                            x1="2"
+                            y1="4"
+                            x2="22"
+                            y2="21"
+                            gradientUnits="userSpaceOnUse"
+                          >
                             <stop stopColor="#C8A24A" />
                             <stop offset="1" stopColor="#E8A6BB" />
                           </linearGradient>
@@ -369,7 +436,13 @@ export default function ChatClient() {
                   </button>
 
                   {/* Divider */}
-                  <div style={{ height: 1, background: "rgba(232,166,187,0.20)", margin: "0 12px" }} />
+                  <div
+                    style={{
+                      height: 1,
+                      background: "rgba(232,166,187,0.20)",
+                      margin: "0 12px",
+                    }}
+                  />
 
                   {/* Gallery */}
                   <button
@@ -379,15 +452,44 @@ export default function ChatClient() {
                   >
                     <span
                       className="flex h-8 w-8 items-center justify-center rounded-xl"
-                      style={{ background: "linear-gradient(135deg, rgba(200,162,74,0.15), rgba(232,166,187,0.15))" }}
+                      style={{
+                        background:
+                          "linear-gradient(135deg, rgba(200,162,74,0.15), rgba(232,166,187,0.15))",
+                      }}
                     >
                       {/* Gallery / image icon */}
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-                        <rect x="3" y="3" width="18" height="18" rx="3" stroke="url(#gal-g)" strokeWidth="1.8" />
+                      <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="3"
+                          stroke="url(#gal-g)"
+                          strokeWidth="1.8"
+                        />
                         <circle cx="8.5" cy="8.5" r="1.5" fill="url(#gal-g)" />
-                        <path d="M3 15l5-5 4 4 3-3 6 6" stroke="url(#gal-g)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path
+                          d="M3 15l5-5 4 4 3-3 6 6"
+                          stroke="url(#gal-g)"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                         <defs>
-                          <linearGradient id="gal-g" x1="3" y1="3" x2="21" y2="21" gradientUnits="userSpaceOnUse">
+                          <linearGradient
+                            id="gal-g"
+                            x1="3"
+                            y1="3"
+                            x2="21"
+                            y2="21"
+                            gradientUnits="userSpaceOnUse"
+                          >
                             <stop stopColor="#C8A24A" />
                             <stop offset="1" stopColor="#E8A6BB" />
                           </linearGradient>
