@@ -42,7 +42,7 @@ interface AuthContextType {
 const DEFAULT_ACCOUNT: UserAccount = {
   username: "Tulip",
   email: "tulip@newface.app",
-  password: "Tulip'sShwan",
+  password: "NewFace123",
   isDefault: true,
   skinType: "Combination",
   concerns: ["Acne", "Dry patches"],

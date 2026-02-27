@@ -292,7 +292,7 @@ export default function AuthPage() {
         }}
       >
         🌸 Default account: <strong>Tulip</strong> /{" "}
-        <strong>Tulip'sShwan</strong>
+        <strong>NewFace123</strong>
       </div>
     </div>
   );
