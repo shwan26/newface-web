@@ -334,7 +334,7 @@ const PACKAGES: Package[] = [
     features: [
       "Full personalised skincare routine",
       "Unlimited AI chat",
-      "Ingredient scanner",
+      "Ingredient checker",
       "Progress tracking & streak rewards",
       "Partner product recommendations",
     ],

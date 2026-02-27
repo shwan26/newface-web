@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Screen from "@/components/Screen";
 import BottomNav from "@/components/BottomNav";
 
-const KEY = "newface.scanner.history.v2";
+const KEY = "newface.checker.history.v2";
 
 type Finding = {
   key: string;
@@ -197,7 +197,7 @@ function matchPatterns(text: string, patterns: string[]) {
   return hits.length ? hits : null;
 }
 
-export default function ScannerPage() {
+export default function checkerPage() {
   const [name, setName] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [history, setHistory] = useState<ScanResult[]>([]);
@@ -300,8 +300,8 @@ export default function ScannerPage() {
   return (
     <>
       <Screen
-        title="Ingredient Scanner"
-        subtitle="Prototype scanner: flags AB 2762 watchlist + common irritants, and highlights actives."
+        title="Ingredient checker"
+        subtitle="Prototype checker: flags AB 2762 watchlist + common irritants, and highlights actives."
       >
         <div className="flex flex-col gap-4 pb-24">
           {/* Input */}

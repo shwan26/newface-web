@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 export default function SkincareSection({
   skinType,
   concerns,
-  onOpenScanner,
+  onOpenchecker,
 }: {
   skinType?: string | null;
   concerns?: string[] | null;
-  onOpenScanner?: () => void; // optional hook if you later add a modal
+  onOpenchecker?: () => void; // optional hook if you later add a modal
 }) {
   const router = useRouter();
 
@@ -34,17 +34,17 @@ export default function SkincareSection({
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
-        {/* Ingredient scanner */}
+        {/* Ingredient checker */}
         <div
           className="rounded-2xl border px-3 py-3"
           style={{ background: "rgba(255,255,255,0.75)", borderColor: "var(--border)" }}
         >
-          <div className="text-xs font-semibold">Ingredient scanner</div>
+          <div className="text-xs font-semibold">Ingredient checker</div>
           <div className="text-[11px] mt-1" style={{ color: "var(--muted)" }}>
             Scan a label to flag irritants + actives for your skin.
           </div>
           <button
-            onClick={() => (onOpenScanner ? onOpenScanner() : router.push("/scanner"))}
+            onClick={() => (onOpenchecker ? onOpenchecker() : router.push("/checker"))}
             className="mt-2 w-full rounded-xl px-3 py-2 text-[11px] font-semibold text-white"
             style={{ background: "linear-gradient(90deg, var(--gold), var(--rose))" }}
           >
