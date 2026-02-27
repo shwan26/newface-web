@@ -212,12 +212,76 @@ function offTopicReply(username: string): string {
   ]);
 }
 
-// ── MAIN EXPORT ──────────────────────────────────────────────────────────────
+// ── MAIN EXPORT ─────────────────────────────────────────────────────────────
+function skincareAddon(profile?: { skinType?: string; concerns?: string[] }) {
+  const skinType = profile?.skinType ?? "your";
+  const c = (profile?.concerns ?? []).slice(0, 3);
+  const concernsText = c.length ? ` (focus: ${c.join(", ")})` : "";
+  return `
+
+---
+
+**✨ Personalised skincare plan**
+Based on your profile: **${skinType} skin**${concernsText}
+
+**AM upgrades**
+- Add targeted serum for your concerns (ex: niacinamide for oil + pores, azelaic for redness, vitamin C for spots)
+- SPF upgrade recommendation based on finish (matte / hydrating)
+
+**PM upgrades**
+- Rotate actives safely (BHA/AHA/retinoid) based on tolerance
+- Barrier nights (ceramides + calming) to prevent irritation
+
+If you tell me what products you already own, I can tailor the routine to your exact shelf.`;
+}
+
+function nutritionAddon(profile?: { goal?: string; water?: string; sleep?: string }) {
+  const goal = profile?.goal ?? "Glow";
+  const water = profile?.water ?? "1–2 L";
+  const sleep = profile?.sleep ?? "7–8 hrs";
+  return `
+
+---
+
+**🥗 Nutrition plan add-on (for skin)**
+Goal: **${goal}**
+- **Daily plate:** protein + fiber + healthy fat (keeps blood sugar stable)
+- **Skin-support foods:** salmon/omega-3, berries, leafy greens, yogurt/kefir (if tolerated)
+- **Hydration target:** ${water} (add electrolytes if you sweat a lot)
+- **Sleep target:** ${sleep} (poor sleep increases inflammation)
+
+Want me to generate a 7-day plan with breakfast/lunch/dinner?`;
+}
+
+function goldAddon() {
+  return `
+
+---
+
+**👑 Gold extras**
+- **Advanced skin analysis (prototype):** share a clear photo + lighting and I’ll give a structured assessment (texture, pores, redness, hydration signals)
+- **Lifestyle tuning:** stress, sleep, exercise, environment triggers
+- **Priority response mode:** shorter, more direct steps + product matching
+- **Monthly expert consult:** I can prep questions for your partner clinic appointment`;
+}
 
 export function generateAssistantReply(
   userText: string,
   username: string = "Tulip",
+  plan: string = "Free plan",
+  profile?: { skinType?: string; concerns?: string[]; goal?: string; condition?: string; sleep?: string; water?: string }
 ): string {
+  
+  const planLower = (plan ?? "").toLowerCase();
+  const isFree = planLower.includes("free");
+  const hasSkincare = planLower.includes("skincare") || planLower.includes("nutrition") || planLower.includes("gold");
+  const hasNutrition = planLower.includes("nutrition") || planLower.includes("gold");
+  const isGold = planLower.includes("gold");
+
+  const skinType = profile?.skinType ?? "unknown";
+  const concerns = profile?.concerns ?? [];
+  const goal = profile?.goal ?? "general";
+
   const t = userText.toLowerCase().trim();
 
   // Chitchat routing — check these first
@@ -342,7 +406,7 @@ export function generateAssistantReply(
       "If severe irritation or cysts worsen, pause all actives and see a professional.",
     ];
     const confidence = subtype === "cystic" ? 0.78 : 0.87;
-    return `${opener}
+    let out = `${opener}
 
 ---
 
@@ -372,7 +436,23 @@ ${safety.map((s) => `- ${s}`).join("\n")}
 - Week 4: Introduce retinol (1x this week, then build slowly)
 
 _Confidence (prototype): ${(confidence * 100).toFixed(0)}% · This is not medical advice._`;
+
+    if (hasSkincare) out += skincareAddon(profile);
+    if (hasNutrition) out += nutritionAddon(profile);
+    if (isGold) out += goldAddon();
+
+    if (isFree) {
+      out += `
+  
+---
+
+🔒 **Free plan note**
+You get **3 AI chats per day**. Upgrade to unlock unlimited chat + personalized plans.`;
   }
+
+  // ✅ AND RETURN IT
+  return out;
+}
 
   // ── DARK SPOTS ────────────────────────────────────────────────────────────
   if (concern === "darkspots") {

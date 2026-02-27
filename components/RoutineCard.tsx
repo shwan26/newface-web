@@ -315,9 +315,20 @@ function CheckItem({
 
 // ── Main Routine Card ─────────────────────────────────────────────────────────
 
-export default function RoutineCard() {
+export default function RoutineCard({
+  title,
+  subtitle,
+  showRewards = true,
+}: {
+  title?: string;
+  subtitle?: string;
+  showRewards?: boolean;
+}) {
   const { user } = useAuth();
   const router = useRouter();
+
+  const plan = (user?.plan ?? "").toLowerCase();
+  const isGold = plan.includes("gold");
 
   const skinType = user?.skinType ?? "default";
   const routines = routinesByType[skinType] ?? routinesByType.default;
@@ -431,9 +442,14 @@ export default function RoutineCard() {
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="text-base font-semibold">Today's Routine</h2>
+            <h2 className="text-base font-semibold">
+              {title ?? (showRewards ? "Today's Routine" : "AM/PM Checklist")}
+            </h2>
             <div className="text-xs mt-0.5" style={{ color: "var(--muted)" }}>
-              🔥 {streak} day streak
+              {subtitle ??
+                (showRewards
+                  ? `🔥 ${streak} day streak`
+                  : "Basic daily steps for healthy skin.")}
             </div>
           </div>
           <button
@@ -449,30 +465,34 @@ export default function RoutineCard() {
           </button>
         </div>
 
-        {/* Circle + level */}
-        <div className="flex justify-center mb-4">
-          <CircularProgress
-            percent={percent}
-            color={levelInfo.color}
-            glow={levelInfo.glow}
-            level={levelInfo.level}
-            levelName={levelInfo.name}
-          />
-        </div>
+        {showRewards && (
+          <>
+            {/* Circle + level */}
+            <div className="flex justify-center mb-4">
+              <CircularProgress
+                percent={percent}
+                color={levelInfo.color}
+                glow={levelInfo.glow}
+                level={levelInfo.level}
+                levelName={levelInfo.name}
+              />
+            </div>
 
-        {/* All done celebration */}
-        {allDone && (
-          <div
-            className="mb-4 rounded-2xl border px-4 py-3 text-center text-sm font-semibold"
-            style={{
-              background: `linear-gradient(90deg, ${levelInfo.color}18, rgba(232,166,187,0.12))`,
-              borderColor: `${levelInfo.color}33`,
-              color: levelInfo.color,
-              animation: "celebrateBounce 0.6s ease",
-            }}
-          >
-            🎉 Amazing, {user?.username ?? "you"}! Routine complete for today!
-          </div>
+            {/* All done celebration */}
+            {allDone && (
+              <div
+                className="mb-4 rounded-2xl border px-4 py-3 text-center text-sm font-semibold"
+                style={{
+                  background: `linear-gradient(90deg, ${levelInfo.color}18, rgba(232,166,187,0.12))`,
+                  borderColor: `${levelInfo.color}33`,
+                  color: levelInfo.color,
+                  animation: "celebrateBounce 0.6s ease",
+                }}
+              >
+                🎉 Amazing, {user?.username ?? "you"}! Routine complete for today!
+              </div>
+            )}
+          </>
         )}
 
         {/* AM / PM tab */}
@@ -519,17 +539,18 @@ export default function RoutineCard() {
           ))}
         </div>
 
-        {/* Unlock button */}
-        <button
-          onClick={() => router.push("/settings")}
-          className="mt-4 w-full rounded-2xl px-4 py-3 text-sm font-semibold text-white transition active:scale-[0.99]"
-          style={{
-            background: "linear-gradient(90deg, var(--gold), var(--rose))",
-            boxShadow: "0 12px 30px rgba(232,166,187,0.18)",
-          }}
-        >
-          Unlock Premium Routines ✨
-        </button>
+        {!isGold && (
+          <button
+            onClick={() => router.push("/settings?tab=premium")}
+            className="mt-4 w-full rounded-2xl px-4 py-3 text-sm font-semibold text-white transition active:scale-[0.99]"
+            style={{
+              background: "linear-gradient(90deg, var(--gold), var(--rose))",
+              boxShadow: "0 12px 30px rgba(232,166,187,0.18)",
+            }}
+          >
+            Unlock Premium Routines ✨
+          </button>
+        )}
       </div>
     </>
   );

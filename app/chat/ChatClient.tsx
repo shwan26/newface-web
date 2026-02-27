@@ -26,6 +26,8 @@ const quickChips = [
   "Give me a 2-minute routine",
 ];
 
+const CHAT_LIMIT_FREE = 3;
+
 export default function ChatClient() {
   const { user } = useAuth();
   const params = useSearchParams();
@@ -37,6 +39,8 @@ export default function ChatClient() {
   const [thinking, setThinking] = useState(false);
   const [attachMenuOpen, setAttachMenuOpen] = useState(false);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
+  const [dailyCount, setDailyCount] = useState(0);
+  const [limitReached, setLimitReached] = useState(false);
 
   const endRef = useRef<HTMLDivElement | null>(null);
   const attachMenuRef = useRef<HTMLDivElement | null>(null);
@@ -44,6 +48,35 @@ export default function ChatClient() {
   const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
   const sessionsPreview = useMemo(() => loadSessions().slice(0, 3), []);
+  const planName = user?.plan ?? "Free plan";
+  const planLower = planName.toLowerCase();
+  const isFreePlan = planLower.includes("free");
+  const hasUnlimitedChat =
+    planLower.includes("skincare") ||
+    planLower.includes("nutrition") ||
+    planLower.includes("gold");
+
+  const chatCountKey = `nf_chat_count_${user?.username ?? "guest"}`;
+  const todayKey = new Date().toISOString().slice(0, 10);
+
+  function loadDailyCount() {
+    try {
+      const raw = localStorage.getItem(chatCountKey);
+      if (!raw) return 0;
+      const parsed = JSON.parse(raw) as { date: string; count: number };
+      if (parsed.date !== todayKey) return 0;
+      return parsed.count ?? 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  function saveDailyCount(count: number) {
+    localStorage.setItem(
+      chatCountKey,
+      JSON.stringify({ date: todayKey, count }),
+    );
+  }
 
   // Close attach menu on outside click
   useEffect(() => {
@@ -71,6 +104,12 @@ export default function ChatClient() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [session?.messages?.length, thinking]);
+
+  useEffect(() => {
+    const count = loadDailyCount();
+    setDailyCount(count);
+    setLimitReached(isFreePlan && count >= CHAT_LIMIT_FREE);
+  }, [user?.username, isFreePlan]);
 
   function createNewChat() {
     const fresh: ChatSession = {
@@ -112,6 +151,10 @@ export default function ChatClient() {
     if (!session) return;
     const trimmed = text.trim();
     if (!trimmed && !attachedImage) return;
+    if (isFreePlan && dailyCount >= CHAT_LIMIT_FREE) {
+      setLimitReached(true);
+      return;
+    }
 
     setInput("");
     const imageToSend = attachedImage;
@@ -139,14 +182,35 @@ export default function ChatClient() {
     });
 
     setThinking(true);
-    await new Promise((r) => setTimeout(r, 850));
-    const replyText = generateAssistantReply(trimmed, user?.username);
+    const planLower = (user?.plan ?? "").toLowerCase();
+    const isGold = planLower.includes("gold");
+    await new Promise((r) => setTimeout(r, isGold ? 250 : 850));
+    
+    const replyText = generateAssistantReply(
+      trimmed,
+      user?.username,
+      user?.plan ?? "Free plan",
+      {
+        skinType: user?.skinType,
+        concerns: user?.concerns,
+        goal: (user as any)?.goal,
+        condition: (user as any)?.condition,
+        sleep: (user as any)?.sleep,
+        water: (user as any)?.water,
+      }
+    );
     pushMessage({
       id: uid(),
       role: "newface",
       text: replyText,
       ts: Date.now(),
     });
+    if (isFreePlan) {
+      const nextCount = dailyCount + 1;
+      setDailyCount(nextCount);
+      saveDailyCount(nextCount);
+      setLimitReached(nextCount >= CHAT_LIMIT_FREE);
+    }
     setThinking(false);
   }
 
@@ -238,6 +302,39 @@ export default function ChatClient() {
         subtitle="Prototype guidance only. Not medical advice."
       >
         <div className="flex flex-col gap-3 pb-24">
+          <div
+            className="rounded-2xl border px-4 py-3 text-xs"
+            style={{
+              background: "rgba(255,255,255,0.70)",
+              borderColor: "var(--border)",
+              color: "var(--muted)",
+            }}
+          >
+            {hasUnlimitedChat ? (
+              <span>
+                Skincare Package: Unlimited AI chat is active for your account.
+              </span>
+            ) : (
+              <span>
+                Free plan: {dailyCount}/{CHAT_LIMIT_FREE} AI messages today.
+              </span>
+            )}
+          </div>
+
+          {limitReached && !hasUnlimitedChat && (
+            <div
+              className="rounded-2xl border px-4 py-3 text-xs"
+              style={{
+                background:
+                  "linear-gradient(90deg, rgba(200,162,74,0.12), rgba(232,166,187,0.12))",
+                borderColor: "rgba(200,162,74,0.25)",
+                color: "var(--muted)",
+              }}
+            >
+              You've reached today's free chat limit. Upgrade to unlock
+              unlimited AI chat.
+            </div>
+          )}
           {/* Quick chips */}
           <div className="flex flex-wrap gap-2">
             {quickChips.map((c) => (
@@ -520,10 +617,14 @@ export default function ChatClient() {
             {/* Send */}
             <button
               onClick={() => send(input)}
+              disabled={limitReached && !hasUnlimitedChat}
               className="rounded-2xl px-4 py-3 text-sm font-semibold transition active:scale-[0.99]"
               style={{
-                background: "linear-gradient(90deg, var(--gold), var(--rose))",
-                color: "white",
+                background:
+                  limitReached && !hasUnlimitedChat
+                    ? "rgba(21,19,22,0.15)"
+                    : "linear-gradient(90deg, var(--gold), var(--rose))",
+                color: limitReached && !hasUnlimitedChat ? "var(--muted)" : "white",
               }}
             >
               Send

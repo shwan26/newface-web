@@ -372,11 +372,6 @@ const PACKAGES: Package[] = [
       "Priority AI responses",
       "Advanced skin analysis",
       "Lifestyle & aesthetic routines",
-      "1-on-1 expert consultation (monthly)",
-      "Exclusive partner discounts",
-      "Priority AI responses",
-      "Advanced skin analysis",
-      "Lifestyle & aesthetic routines",
     ],
   },
 ];
