@@ -3,7 +3,7 @@
 import BottomNav from "@/components/BottomNav";
 import Screen from "@/components/Screen";
 import { Chip, GhostButton, PrimaryButton } from "@/components/UI";
-import { generateAssistantReply } from "@/lib/fakeAI";
+import { generateAssistantReply, analyzePhotoForAcne } from "@/lib/fakeAI";
 import type { ChatMessage, ChatSession } from "@/lib/types";
 import { getSession, loadSessions, upsertSession } from "@/lib/storage";
 import { useAuth } from "@/app/context/AuthContext";
@@ -139,14 +139,30 @@ export default function ChatClient() {
     });
 
     setThinking(true);
-    await new Promise((r) => setTimeout(r, 850));
-    const replyText = generateAssistantReply(trimmed, user?.username);
-    pushMessage({
-      id: uid(),
-      role: "newface",
-      text: replyText,
-      ts: Date.now(),
-    });
+
+    // If image was sent, analyze it with longer loading time
+    if (imageToSend) {
+      // Show fake analyzing state for image processing
+      await new Promise((r) => setTimeout(r, 2200)); // Longer delay for image analysis
+      const analysisText = analyzePhotoForAcne(user?.username);
+      pushMessage({
+        id: uid(),
+        role: "newface",
+        text: analysisText,
+        ts: Date.now(),
+      });
+    } else {
+      // Regular text-based response
+      await new Promise((r) => setTimeout(r, 850));
+      const replyText = generateAssistantReply(trimmed, user?.username);
+      pushMessage({
+        id: uid(),
+        role: "newface",
+        text: replyText,
+        ts: Date.now(),
+      });
+    }
+
     setThinking(false);
   }
 

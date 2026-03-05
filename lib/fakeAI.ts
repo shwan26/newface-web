@@ -212,6 +212,171 @@ function offTopicReply(username: string): string {
   ]);
 }
 
+// ── IMAGE ANALYSIS ───────────────────────────────────────────────────────────
+
+export function analyzePhotoForAcne(username: string = "Tulip"): string {
+  // Simulate different acne conditions detected in the photo
+  const conditions = [
+    "general-acne",
+    "cystic-acne",
+    "blackheads",
+    "whitehead-acne",
+    "oily-acne",
+  ];
+
+  const detected = pick(conditions);
+  const severityOptions = ["mild", "moderate", "severe"];
+  const severity = pick(severityOptions);
+
+  const severityText =
+    severity === "mild"
+      ? "I can see some light breakout activity"
+      : severity === "moderate"
+        ? "I can see moderate breakout and congestion"
+        : "I can see significant acne activity that needs targeted care";
+
+  const opener = pick([
+    `📸 **Photo Analysis Complete** — ${username}, here's what I see:`,
+    `📸 **Skin Assessment** — I've analyzed your photo, ${username}. Here's my breakdown:`,
+    `📸 **Image Analysis Ready** — Great skin shot, ${username}! Here's what the photo reveals:`,
+  ]);
+
+  const findings =
+    detected === "general-acne"
+      ? `**Condition Detected:** General acne with mixed lesions (comedones + papules)\n**Severity:** ${severityText}\n**Primary Issue:** Bacterial colonisation + pore congestion`
+      : detected === "cystic-acne"
+        ? `**Condition Detected:** Cystic/nodular acne (deep, painful lesions)\n**Severity:** ${severityText}\n**Primary Issue:** Deep inflammation — may require professional intervention`
+        : detected === "blackheads"
+          ? `**Condition Detected:** Comedonal acne (predominantly blackheads)\n**Severity:** ${severityText}\n**Primary Issue:** Oxidised sebum + dead skin clogging pores`
+          : detected === "whitehead-acne"
+            ? `**Condition Detected:** Closed comedonal acne (whiteheads)\n**Severity:** ${severityText}\n**Primary Issue:** Trapped sebum beneath skin surface`
+            : `**Condition Detected:** Oily, congestion-prone skin with active breakouts\n**Severity:** ${severityText}\n**Primary Issue:** Excess sebum production + bacterial overgrowth`;
+
+  const targetedRoutine =
+    detected === "cystic-acne"
+      ? `**🌅 AM Routine**
+- Gentle cleanser (non-irritating, pH 5.5)
+- Azelaic acid 15% (anti-inflammatory, antibacterial) — exceptional for deep acne
+- Lightweight moisturiser
+- SPF 50 mineral (zinc oxide preferred — calming)
+
+**🌙 PM Routine**
+- Gentle cleanser
+- Benzoyl peroxide 2.5% (targeted spot treatment on cystic lesions only — not all-over)
+- Azelaic acid 15% (all over after BP dries)
+- Light moisturiser
+- Optional: ice roller before bed to reduce inflammation
+
+**⚠️ Important:** Cystic acne often has a hormonal or internal component. If this persists beyond 4 weeks of treatment, please consult a dermatologist — you may need oral medication (antibiotics, spironolactone, or isotretinoin).
+
+**Weekly additions (weeks 3+):**
+- Low-dose retinol 0.025% (1x/week, build slowly) — only after inflammation calms`
+      : detected === "blackheads"
+        ? `**🌅 AM Routine**
+- BHA (salicylic acid 1–2%) cleanser or toner
+- Niacinamide 10% serum (pore-minimising)
+- Oil-free moisturiser
+- SPF 30+
+
+**🌙 PM Routine**
+- BHA cleanser (double cleanse if wearing SPF/makeup)
+- BHA toner or serum (alternate nights: Mon/Wed/Fri)
+- Clay mask (kaolin or bentonite) 1–2x/week, 10 min
+- Retinol 0.03% (start 1x/week after BHA established)
+- Lightweight moisturiser
+
+**Pro tip:** Blackheads = oxidised sebum, not dirt. BHA is oil-soluble and dives into pores — it's the gold standard. Physical extraction worsens them.`
+        : detected === "whitehead-acne"
+          ? `**🌅 AM Routine**
+- Gentle gel cleanser
+- BHA (salicylic acid 1–2%) toner or serum
+- Niacinamide 10% (anti-inflammatory)
+- Lightweight moisturiser
+- SPF 30+
+
+**🌙 PM Routine**
+- Gentle cleanser
+- BHA toner (3–5x/week)
+- Retinol 0.03–0.05% (2–3x/week, not same night as BHA)
+- Moisturiser
+
+**Critical:** Never squeeze whiteheads — you'll push bacteria deeper and cause permanent scarring. BHA + retinol are your best friends here.`
+          : detected === "oily-acne"
+            ? `**🌅 AM Routine**
+- Gel or foam cleanser (oil-control formula)
+- Niacinamide 10% serum (sebum regulator)
+- Oil-free fluid moisturiser (or skip if skin feels hydrated)
+- SPF 30+ fluid (NOT cream)
+
+**🌙 PM Routine**
+- Gel cleanser (double cleanse)
+- BHA toner (3–4x/week) — oil-soluble, tackles sebum at source
+- Retinol 0.025% (2–3x/week, alternate with BHA nights)
+- Lightweight gel moisturiser
+
+**Key insight:** Oily skin ≠ hydrated skin. You still need moisture, but in lightweight forms. Oil accumulation on skin = bacteria + clogged pores = breakouts.`
+            : `**🌅 AM Routine**
+- Gentle cleanser
+- Niacinamide 10% serum (universally calming)
+- Lightweight moisturiser with ceramides
+- SPF 30+
+
+**🌙 PM Routine**
+- Gentle cleanser
+- BHA toner (2–3x/week) — gentler introduction for mixed acne
+- Retinol 0.025% (1–2x/week, build slowly)
+- Moisturiser
+
+**Ingredient focus:** Start with lower concentrations (salicylic acid 1%, retinol 0.025%) and build tolerance over 4–6 weeks.`;
+
+  const timeline = pick([
+    `**⏳ Expected Results:**
+- Weeks 1–2: Possible purging (skin brings congestion to surface — normal!)
+- Weeks 3–4: Inflammation calms, less red
+- Weeks 6–8: Visible improvement in active lesions
+- 12+ weeks: Clear, smooth texture`,
+    `**📈 Timeline to Clear Skin:**
+- Days 1–7: Focus on consistency, not results
+- Weeks 2–3: You may see temporary worsening (purging) — this is a good sign
+- Weeks 4–6: First signs of improvement appear
+- Weeks 8–12: Significant clearing (if routine is consistent)`,
+  ]);
+
+  return `${opener}
+
+---
+
+${findings}
+
+---
+
+**💊 Personalised Routine for Your Condition**
+
+${targetedRoutine}
+
+---
+
+${timeline}
+
+---
+
+**⚠️ Safety Checklist**
+- ✅ Start with ONE active ingredient (BHA or retinol, not both at once)
+- ✅ Patch test on inner arm for 24–48 hours first
+- ✅ Wait 5–7 days between introducing new products
+- ✅ Use SPF daily — acne treatments make skin sun-sensitive
+- ✅ If severe irritation or cysts worsen, pause and see a dermatologist
+
+---
+
+**🚨 When to See a Dermatologist**
+If you experience: severe pain, cysts that don't improve in 4 weeks, signs of infection (pus, warmth, spreading), or scarring — professional treatment may be needed.
+
+---
+
+_📸 This analysis is AI-powered and based on visual assessment only. I am not a doctor and cannot diagnose skin conditions. For persistent or severe acne, please consult a dermatologist. Confidence: 81%_`;
+}
+
 // ── MAIN EXPORT ──────────────────────────────────────────────────────────────
 
 export function generateAssistantReply(
