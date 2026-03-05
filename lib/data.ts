@@ -5,21 +5,21 @@ export const partnerPicks = [
     name: "UV Whitening Soft Screen",
     tag: "Sponsored",
     note: "SPF focus",
-    image: "/web_products_DsMpJEyYpD113519.png",
+    image: "/KA_UV.png",
   },
   {
     brand: "La Roche-Posay",
     name: "UVMune 400",
     tag: "Partner",
     note: "High UVA protection",
-    image: "/16747905387250.jpg",
+    image: "/La_roche.jpg",
   },
   {
     brand: "Eucerin",
     name: "Sun Dry Touch SPF50+",
     tag: "Sponsored",
     note: "Light feel",
-    image: "/4a9c26abbd5a4fa5a2d93d5004fe8f1b-screen.webp",
+    image: "/eucerin_sun_dry.jpeg",
   },
 ];
 

@@ -382,7 +382,20 @@ _📸 This analysis is AI-powered and based on visual assessment only. I am not 
 export function generateAssistantReply(
   userText: string,
   username: string = "Tulip",
+  plan: string = "Free plan",
+  profile?: { skinType?: string; concerns?: string[]; goal?: string; condition?: string; sleep?: string; water?: string }
 ): string {
+  
+  const planLower = (plan ?? "").toLowerCase();
+  const isFree = planLower.includes("free");
+  const hasSkincare = planLower.includes("skincare") || planLower.includes("nutrition") || planLower.includes("gold");
+  const hasNutrition = planLower.includes("nutrition") || planLower.includes("gold");
+  const isGold = planLower.includes("gold");
+
+  const skinType = profile?.skinType ?? "unknown";
+  const concerns = profile?.concerns ?? [];
+  const goal = profile?.goal ?? "general";
+
   const t = userText.toLowerCase().trim();
 
   // Chitchat routing — check these first
@@ -507,7 +520,7 @@ export function generateAssistantReply(
       "If severe irritation or cysts worsen, pause all actives and see a professional.",
     ];
     const confidence = subtype === "cystic" ? 0.78 : 0.87;
-    return `${opener}
+    let out = `${opener}
 
 ---
 
@@ -537,7 +550,23 @@ ${safety.map((s) => `- ${s}`).join("\n")}
 - Week 4: Introduce retinol (1x this week, then build slowly)
 
 _Confidence (prototype): ${(confidence * 100).toFixed(0)}% · This is not medical advice._`;
+
+    if (hasSkincare) out += skincareAddon(profile);
+    if (hasNutrition) out += nutritionAddon(profile);
+    if (isGold) out += goldAddon();
+
+    if (isFree) {
+      out += `
+  
+---
+
+🔒 **Free plan note**
+You get **3 AI chats per day**. Upgrade to unlock unlimited chat + personalized plans.`;
   }
+
+  // ✅ AND RETURN IT
+  return out;
+}
 
   // ── DARK SPOTS ────────────────────────────────────────────────────────────
   if (concern === "darkspots") {

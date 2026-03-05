@@ -1,15 +1,14 @@
-// app/settings/page.tsx
-import { Suspense } from "react";
-import SettingsClient from "./SettingsClient";
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import BottomNav from "@/components/BottomNav";
 import Screen from "@/components/Screen";
 import { deleteAllSessions } from "@/lib/storage";
 import { useAuth } from "@/app/context/AuthContext";
-import { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
-// ── Reusable toggle ───────────────────────────────────────────────────────────
+
+/* ── Reusable toggle ───────────────────────────────────────────────────────── */
 function Toggle({
   value,
   onChange,
@@ -83,7 +82,7 @@ function Toggle({
   );
 }
 
-// ── Setting row ───────────────────────────────────────────────────────────────
+/* ── Setting row ───────────────────────────────────────────────────────────── */
 function SettingRow({
   icon,
   label,
@@ -131,7 +130,7 @@ function SettingRow({
   );
 }
 
-// ── Card ──────────────────────────────────────────────────────────────────────
+/* ── Card ─────────────────────────────────────────────────────────────────── */
 function Card({
   title,
   children,
@@ -173,7 +172,7 @@ function Divider() {
   );
 }
 
-// ── Icons ─────────────────────────────────────────────────────────────────────
+/* ── Icons ────────────────────────────────────────────────────────────────── */
 const GradientDefs = () => (
   <defs>
     <linearGradient
@@ -189,6 +188,7 @@ const GradientDefs = () => (
     </linearGradient>
   </defs>
 );
+
 function IconPhoto() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
@@ -213,6 +213,7 @@ function IconPhoto() {
     </svg>
   );
 }
+
 function IconBell() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
@@ -233,6 +234,7 @@ function IconBell() {
     </svg>
   );
 }
+
 function IconAnalytics() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
@@ -246,6 +248,7 @@ function IconAnalytics() {
     </svg>
   );
 }
+
 function IconTrash() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -259,6 +262,7 @@ function IconTrash() {
     </svg>
   );
 }
+
 function IconCrown({ color = "#C8A24A" }: { color?: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -272,6 +276,7 @@ function IconCrown({ color = "#C8A24A" }: { color?: string }) {
     </svg>
   );
 }
+
 function IconCheck() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -286,8 +291,7 @@ function IconCheck() {
   );
 }
 
-// ── Package data ──────────────────────────────────────────────────────────────
-
+/* ── Package data ─────────────────────────────────────────────────────────── */
 interface Package {
   id: string;
   name: string;
@@ -330,7 +334,7 @@ const PACKAGES: Package[] = [
     features: [
       "Full personalised skincare routine",
       "Unlimited AI chat",
-      "Ingredient scanner",
+      "Ingredient checker",
       "Progress tracking & streak rewards",
       "Partner product recommendations",
     ],
@@ -372,8 +376,7 @@ const PACKAGES: Package[] = [
   },
 ];
 
-// ── Upgrade Modal ─────────────────────────────────────────────────────────────
-
+/* ── Upgrade Modal ────────────────────────────────────────────────────────── */
 function UpgradeModal({
   currentPlan,
   onClose,
@@ -390,7 +393,6 @@ function UpgradeModal({
 
   const selectedPkg = PACKAGES.find((p) => p.id === selected);
 
-  // Auto-scroll to confirm button when package is selected
   useEffect(() => {
     if (selected && confirmButtonRef.current) {
       setTimeout(() => {
@@ -431,7 +433,6 @@ function UpgradeModal({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Handle */}
         <div className="pt-4 flex justify-center">
           <div
             className="h-1 w-10 rounded-full"
@@ -439,7 +440,6 @@ function UpgradeModal({
           />
         </div>
 
-        {/* Header */}
         <div className="px-5 pt-4 pb-3">
           <div className="flex items-center gap-2 mb-1">
             <IconCrown color="#C8A24A" />
@@ -450,7 +450,6 @@ function UpgradeModal({
           </div>
         </div>
 
-        {/* Success state */}
         {success ? (
           <div className="px-5 pb-32 flex flex-col items-center gap-3 pt-4">
             <div
@@ -474,7 +473,6 @@ function UpgradeModal({
           </div>
         ) : (
           <div className="px-4 pb-32 flex flex-col gap-3">
-            {/* Package cards */}
             {PACKAGES.map((pkg) => {
               const isCurrent =
                 pkg.id === currentPlan ||
@@ -490,13 +488,13 @@ function UpgradeModal({
                     background: isSelected
                       ? `linear-gradient(135deg, ${pkg.color}18, ${pkg.color}08)`
                       : isCurrent
-                        ? "rgba(21,19,22,0.03)"
-                        : "rgba(255,255,255,0.80)",
+                      ? "rgba(21,19,22,0.03)"
+                      : "rgba(255,255,255,0.80)",
                     borderColor: isSelected
                       ? pkg.color
                       : isCurrent
-                        ? "var(--border)"
-                        : "var(--border)",
+                      ? "var(--border)"
+                      : "var(--border)",
                     boxShadow: isSelected ? `0 4px 20px ${pkg.glow}` : "none",
                     opacity: isCurrent ? 0.65 : 1,
                     cursor: isCurrent ? "default" : "pointer",
@@ -522,7 +520,6 @@ function UpgradeModal({
                     </div>
 
                     <div className="flex items-center gap-1.5 flex-shrink-0">
-                      {/* Badge */}
                       <span
                         className="rounded-full px-2 py-0.5 text-[10px] font-bold"
                         style={{
@@ -530,13 +527,14 @@ function UpgradeModal({
                             ? "rgba(21,19,22,0.08)"
                             : `${pkg.color}22`,
                           color: isCurrent ? "var(--muted)" : pkg.color,
-                          border: `1px solid ${isCurrent ? "var(--border)" : pkg.color + "44"}`,
+                          border: `1px solid ${
+                            isCurrent ? "var(--border)" : pkg.color + "44"
+                          }`,
                         }}
                       >
                         {isCurrent ? "Current" : pkg.badge}
                       </span>
 
-                      {/* Selection circle */}
                       {!isCurrent && (
                         <div
                           className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full transition-all"
@@ -556,7 +554,6 @@ function UpgradeModal({
                     </div>
                   </div>
 
-                  {/* Features */}
                   <div className="mt-3 flex flex-col gap-1.5">
                     {pkg.features.map((f) => (
                       <div
@@ -578,19 +575,23 @@ function UpgradeModal({
               );
             })}
 
-            {/* Confirm button */}
             <button
               ref={confirmButtonRef}
               onClick={handleConfirm}
               disabled={!selected || confirming}
-              className="w-full rounded-2xl py-3.5 text-sm font-bold text-white transition active:scale-[0.99] mt-1"
+              className="w-full rounded-2xl py-3.5 text-sm font-bold text-white transition active:scale-[0.99] mt-1 disabled:opacity-60"
               style={{
                 background: selected
-                  ? `linear-gradient(90deg, ${PACKAGES.find((p) => p.id === selected)?.color ?? "#C8A24A"}, #E8A6BB)`
+                  ? `linear-gradient(90deg, ${
+                      PACKAGES.find((p) => p.id === selected)?.color ?? "#C8A24A"
+                    }, #E8A6BB)`
                   : "rgba(21,19,22,0.10)",
                 color: selected ? "white" : "var(--muted)",
                 boxShadow: selected
-                  ? `0 8px 24px ${PACKAGES.find((p) => p.id === selected)?.glow ?? "rgba(200,162,74,0.3)"}`
+                  ? `0 8px 24px ${
+                      PACKAGES.find((p) => p.id === selected)?.glow ??
+                      "rgba(200,162,74,0.3)"
+                    }`
                   : "none",
                 cursor: selected ? "pointer" : "not-allowed",
               }}
@@ -598,8 +599,10 @@ function UpgradeModal({
               {confirming
                 ? "Processing…"
                 : selected
-                  ? `Upgrade to ${PACKAGES.find((p) => p.id === selected)?.name}`
-                  : "Select a package to continue"}
+                ? `Upgrade to ${
+                    PACKAGES.find((p) => p.id === selected)?.name ?? ""
+                  }`
+                : "Select a package to continue"}
             </button>
 
             <p
@@ -615,17 +618,10 @@ function UpgradeModal({
   );
 }
 
-export default function SettingsPage() {
-  return (
-    <Suspense fallback={null}>
-      <SettingsContent />
-    </Suspense>
-  );
-}
-
-// ── Main Content (client logic) ──────────────────────────────────────────────
-function SettingsContent() {
+/* ── Main ─────────────────────────────────────────────────────────────────── */
+export default function SettingsClient() {
   const { user, updateProfile } = useAuth();
+
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
@@ -641,11 +637,8 @@ function SettingsContent() {
     setAnalytics(localStorage.getItem("newface.analytics") !== "false");
   }, []);
 
-  // Auto-open upgrade modal when tab=premium
   useEffect(() => {
-    if (tab === "premium") {
-      setUpgradeOpen(true);
-    }
+    if (tab === "premium") setUpgradeOpen(true);
   }, [tab]);
 
   function persist(key: string, val: boolean) {
@@ -669,7 +662,7 @@ function SettingsContent() {
     PACKAGES.find(
       (p) =>
         currentPlan.toLowerCase().includes(p.id) ||
-        (isFreePlan && p.id === "free"),
+        (isFreePlan && p.id === "free")
     ) ?? PACKAGES[0];
 
   return (
@@ -684,7 +677,179 @@ function SettingsContent() {
 
       <Screen title="Settings" subtitle="Your preferences, stored locally.">
         <div className="flex flex-col gap-3 pb-24">
-          {/* Your entire existing UI stays EXACTLY the same */}
+          {/* Current Plan */}
+          <div
+            className="rounded-2xl border p-4"
+            style={{
+              background: isFreePlan
+                ? "linear-gradient(135deg, rgba(200,162,74,0.06), rgba(232,166,187,0.06))"
+                : `linear-gradient(135deg, ${currentPkg.color}12, ${currentPkg.color}06)`,
+              borderColor: isFreePlan
+                ? "rgba(200,162,74,0.20)"
+                : `${currentPkg.color}33`,
+            }}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-xl"
+                  style={{
+                    background: isFreePlan
+                      ? "linear-gradient(135deg, rgba(200,162,74,0.15), rgba(232,166,187,0.15))"
+                      : `${currentPkg.color}22`,
+                    border: `1px solid ${
+                      isFreePlan
+                        ? "rgba(200,162,74,0.25)"
+                        : currentPkg.color + "44"
+                    }`,
+                  }}
+                >
+                  {currentPkg.emoji}
+                </div>
+                <div>
+                  <div
+                    className="text-[11px] font-semibold uppercase tracking-widest"
+                    style={{ color: "var(--muted)" }}
+                  >
+                    Current Plan
+                  </div>
+                  <div
+                    className="text-sm font-bold mt-0.5"
+                    style={{
+                      color: isFreePlan ? "var(--fg)" : currentPkg.color,
+                    }}
+                  >
+                    {currentPlan}
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setUpgradeOpen(true)}
+                className="flex items-center gap-1.5 rounded-2xl px-3 py-2 text-xs font-bold text-white transition active:scale-95"
+                style={{
+                  background: "linear-gradient(90deg, #C8A24A, #E8A6BB)",
+                  boxShadow: "0 4px 14px rgba(232,166,187,0.30)",
+                }}
+              >
+                <IconCrown color="white" />
+                Upgrade
+              </button>
+            </div>
+
+            {isFreePlan && (
+              <div
+                className="mt-3 rounded-xl px-3 py-2 text-xs"
+                style={{
+                  background: "rgba(255,255,255,0.60)",
+                  color: "var(--muted)",
+                }}
+              >
+                🌸 Unlock full routines, unlimited AI chat & more — starting at{" "}
+                <strong style={{ color: "#C8A24A" }}>199 THB/mo</strong>
+              </div>
+            )}
+          </div>
+
+          {/* Privacy */}
+          <Card title="Privacy">
+            <SettingRow
+              icon={<IconPhoto />}
+              label="Save photos"
+              description="Photos stay on your device only."
+              value={savePhotos}
+              onChange={(v) => {
+                setSavePhotos(v);
+                persist("newface.savePhotos.v2", v);
+              }}
+            />
+            <Divider />
+            <SettingRow
+              icon={<IconAnalytics />}
+              label="Usage analytics"
+              description="Anonymous, no personal data."
+              value={analytics}
+              onChange={(v) => {
+                setAnalytics(v);
+                persist("newface.analytics", v);
+              }}
+            />
+            <div className="pb-1" />
+          </Card>
+
+          {/* Preferences */}
+          <Card title="Preferences">
+            <SettingRow
+              icon={<IconBell />}
+              label="Notifications"
+              description="Routine reminders & tips."
+              value={notifications}
+              onChange={(v) => {
+                setNotifications(v);
+                persist("newface.notifications", v);
+              }}
+            />
+            <div className="pb-1" />
+          </Card>
+
+          {/* Data */}
+          <Card title="Data">
+            <div className="py-3">
+              <p className="text-xs mb-3" style={{ color: "var(--muted)" }}>
+                Chats are stored locally in your browser. Clearing removes all
+                sessions permanently.
+              </p>
+              <button
+                onClick={clearHistory}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-semibold transition active:scale-[0.98]"
+                style={{
+                  background: cleared
+                    ? "rgba(232,166,187,0.12)"
+                    : "rgba(232,166,187,0.09)",
+                  border: "1.5px solid rgba(232,166,187,0.35)",
+                  color: cleared ? "#C8A24A" : "#E8A6BB",
+                }}
+              >
+                {cleared ? (
+                  <>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M5 13l4 4L19 7"
+                        stroke="#C8A24A"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Cleared!
+                  </>
+                ) : (
+                  <>
+                    <IconTrash />
+                    Clear chat history
+                  </>
+                )}
+              </button>
+            </div>
+          </Card>
+
+          {/* Disclaimer */}
+          <div
+            className="rounded-2xl border px-4 py-3 text-xs"
+            style={{
+              borderColor: "var(--border)",
+              background:
+                "linear-gradient(90deg, rgba(200,162,74,0.08), rgba(232,166,187,0.10))",
+              color: "var(--muted)",
+              lineHeight: 1.6,
+            }}
+          >
+            <span className="font-semibold" style={{ color: "var(--fg)" }}>
+              Prototype disclaimer:{" "}
+            </span>
+            Guidance only — not a medical diagnosis. For severe or persistent
+            symptoms, consult a dermatologist.
+          </div>
         </div>
       </Screen>
 
