@@ -7,6 +7,57 @@ function hasAny(text: string, words: string[]) {
 }
 
 // ── CHITCHAT DETECTORS ───────────────────────────────────────────────────────
+function skincareAddon(profile?: any): string {
+  if (!profile) return "";
+
+  return `
+
+---
+
+✨ **Extra Skincare Personalisation**
+
+Based on your profile:
+- Skin type: ${profile.skinType ?? "unknown"}
+- Goal: ${profile.goal ?? "general skin health"}
+
+Tips:
+- Stick to a consistent routine for at least 6–8 weeks.
+- Avoid introducing multiple actives at once.
+- Hydration and SPF dramatically improve long-term skin health.
+`;
+}
+
+function nutritionAddon(profile?: any): string {
+  return `
+
+---
+
+🥗 **Nutrition for Better Skin**
+
+Diet plays a real role in skin health:
+
+- Omega-3 foods (salmon, chia seeds, walnuts) help reduce inflammation.
+- Zinc-rich foods (pumpkin seeds, lentils) support acne healing.
+- Limit high-glycemic foods (sugar, white bread) if breakouts are frequent.
+- Drink enough water daily to support skin hydration.
+
+`;
+}
+
+function goldAddon(): string {
+  return `
+
+---
+
+👑 **Gold Plan Insight**
+
+As a Gold member you can:
+- Get deeper routine optimisation
+- Receive ingredient compatibility checks
+- Access advanced skin analysis features
+
+`;
+}
 
 function isGreeting(t: string) {
   return /^(hi|hey|hello|hiya|heya|yo|sup|howdy|helo|hii+|hai|good morning|good evening|good afternoon|morning|evening|afternoon|what'?s up|wazzup|greetings)[\s!?.]*$/.test(
